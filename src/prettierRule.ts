@@ -60,6 +60,18 @@ class Walker extends tslint.AbstractWalker<any[]> {
       }
     }
 
+    // Check if the file is ignored by .prettierignore
+    // ref: https://github.com/prettier/eslint-plugin-prettier/pull/111/files
+    const prettierFileInfo =
+      prettier.getFileInfo && prettier.getFileInfo.sync
+        ? prettier.getFileInfo.sync(sourceFile.fileName, {
+            ignorePath: '.prettierignore',
+          })
+        : { ignored: false, inferredParser: null };
+    if (prettierFileInfo.ignored) {
+      return;
+    }
+
     const source = sourceFile.getFullText();
 
     try {
